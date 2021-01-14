@@ -1,44 +1,59 @@
 class TasksController < ApplicationController
   def index
-    @tasks = Task.all
+    @tasks = current_user.projects.tasks.all
   end
 
   def create
-    @task = Task.new(task_create_params)
+    @task = project.tasks.create(task_create_params)
     if @task.save
-      redirect_to tasks_path
+      redirect_to project_path(project)
     else
       flash[:error] = "Task creation failed! #{print_errors(@task)}"
-      redirect_to tasks_path
+      redirect_to project_path(project)
     end
   end
 
   def update
-    @task = Task.find(params[:id])
-    if @task.update(task_update_params)
-      redirect_to tasks_path
+    if task.update(task_update_params)
+      redirect_to project_path(project)
     else
-      flash[:error] = "Task failed to update! #{print_errors(@task)}"
-      redirect_to tasks_path
+      flash[:error] = "Task failed to update! #{print_errors(task)}"
+      redirect_to project_path(project)
     end
   end
 
   def destroy
-    @task = Task.find(params[:id])
-    if @task.delete
-      redirect_to tasks_path
+    if task.delete
+      redirect_to project_path(project)
     else
-      flash[:error] = "Task deletion failed! #{print_errors(@task)}"
-      redirect_to tasks_path
+      flash[:error] = "Task deletion failed! #{print_errors(task)}"
+      redirect_to project_path(project)
     end
   end
 
+  def done
+    byebug
+    task.update(done: params[:action])
+
+    redirect_to project_path(project)
+  end
+
+  private
+
+  def project
+    @project = current_user.projects.find(params[:project_id])
+  end
+
+  def task
+    @task = project.tasks.find(params[:task_id])
+  end
+
   def task_create_params
-    params.permit(:todo)
+    params.require(:task).permit(:todo, :deadline)
   end
 
   def task_update_params
-    params.permit(:todo, :done)
+    params.require(:task).permit(:todo, :deadline, :done)
   end
 
   def print_errors task

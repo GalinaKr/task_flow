@@ -1,0 +1,48 @@
+<%= render 'navigation/nav_bar' %>
+<div class="h1">
+  Project: <%=@project.project_name %>
+</div>
+
+<div class="h3">
+  Tasks:
+</div>
+
+<div class="container">
+
+  <% @project.tasks.each do |task| %>
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col">Task</div>
+          <div class="col">Deadline</div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <%= task.todo %>
+          </div>
+          <div class="col">
+            <%= task.deadline %>
+          </div>
+        </div>
+        <div class="row">
+        <%= link_to 'Done', project_task_done_path(@project, task.id), remote: true, method: 'put', class: "btn" %>
+
+        <%= link_to 'Update', edit_project_task_path(@project, task.id), class: "btn btn-primary" %>
+
+          <%= link_to 'Delete', project_task_path(@project, task.id),
+                    method: :delete,
+                    class: "btn btn-danger",
+                    data: { confirm: "Are you sure?" }%>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <%= form_with model: [@project, @project.tasks.create] do |f| %>
+    <%= f.text_field :todo, class:"form-control" %>
+    <%= f.date_select :deadline, class:"form-control" %>
+    <%= f.submit 'Add a New Task' %>
+  <% end %>
+
+
+</div>

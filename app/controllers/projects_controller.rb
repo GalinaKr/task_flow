@@ -1,10 +1,10 @@
 class ProjectsController < ApplicationController
   def index
-    @projects = Project.all
+    @projects = current_user.projects
   end
 
   def create
-    @project = Project.new(project_create_params)
+    @project = current_user.projects.new(project_params)
     if @project.save
       redirect_to projects_path
     else
@@ -13,9 +13,13 @@ class ProjectsController < ApplicationController
     end
   end
 
+  def show
+    @project = current_user.projects.find(params[:id])
+  end
+
   def update
-    @project = Project.find(params[:id])
-    if @project.update(project_update_params)
+    @project = current_user.projects.find(params[:id])
+    if @project.update(project_params)
       redirect_to projects_path
     else
       flash[:error] = "Project failed to update! #{print_errors(@project)}"
@@ -24,7 +28,7 @@ class ProjectsController < ApplicationController
   end
 
   def destroy
-    @project = Project.find(params[:id])
+    @project = current_user.projects.find(params[:id])
     if @project.delete
       redirect_to projects_path
     else
@@ -33,15 +37,11 @@ class ProjectsController < ApplicationController
     end
   end
 
-  def project_create_params
-    params.permit(:project_name)
-  end
-
-  def project_update_params
+  def project_params
     params.permit(:project_name)
   end
 
   def print_errors project
-    task.errors.full_messages.join(", ") + "."
+    project.errors.full_messages.join(", ") + "."
   end
 end
