@@ -32,7 +32,6 @@ class TasksController < ApplicationController
   end
 
   def done
-    byebug
     task.update(done: params[:action])
 
     redirect_to project_path(project)
